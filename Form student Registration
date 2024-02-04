@@ -1,0 +1,226 @@
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+class StudentRegistration extends JFrame {
+    private JTextField nameField;
+    private JTextField numberField;
+    private JTable table;
+    private DefaultTableModel tableModel;
+    private JButton saveButton;
+    private JButton deleteButton;
+    private JLabel totalSubjectsLabel;
+    private JLabel labelTitle;
+
+    public StudentRegistration() {
+        initComponents();
+        initTable();
+    }
+
+    private void initComponents() {
+        setTitle("Student Registration System");
+        labelTitle = new JLabel();
+        JLabel labelName = new JLabel();
+        JLabel labelNumber = new JLabel();
+        nameField = new JTextField();
+        numberField = new JTextField();
+        JScrollPane jScrollPane1 = new JScrollPane();
+        table = new JTable();
+        saveButton = new JButton();
+        deleteButton = new JButton();
+        totalSubjectsLabel = new JLabel();
+
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+        labelName.setText("Subject Name");
+
+        labelNumber.setText("SKS credit");
+
+        numberField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                numberFieldActionPerformed(evt);
+            }
+        });
+
+        table.setModel(new DefaultTableModel(
+                new Object[][]{
+                        {null, null},
+                        {null, null},
+                        {null, null},
+                        {null, null}
+                },
+                new String[]{
+                        "Subject Name", "SKS"
+                }
+        ));
+        jScrollPane1.setViewportView(table);
+
+        saveButton.setText("Save");
+        deleteButton.setText("Delete");
+
+        totalSubjectsLabel.setFont(new java.awt.Font("Segoe UI", 1, 14));
+        totalSubjectsLabel.setText("Total SKS by Subject : 0");
+
+        labelTitle.setFont(new java.awt.Font("Segoe UI", 1, 18));
+        labelTitle.setText("Registration Student");
+
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                saveData();
+            }
+        });
+
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                deleteData();
+            }
+        });
+
+        GroupLayout layout = new GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addGap(19, 19, 19)
+                                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                                        .addComponent(labelNumber, GroupLayout.PREFERRED_SIZE, 105, GroupLayout.PREFERRED_SIZE)
+                                                                        .addComponent(labelName))
+                                                                .addGap(18, 18, 18)
+                                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                                                        .addComponent(nameField, GroupLayout.DEFAULT_SIZE, 162, Short.MAX_VALUE)
+                                                                        .addComponent(numberField)))
+                                                        .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                                .addContainerGap()
+                                                                .addComponent(saveButton, GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
+                                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(deleteButton, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)))
+                                                .addGap(26, 26, 26)
+                                                .addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 350, GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGap(246, 246, 246)
+                                                .addComponent(labelTitle))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGap(230, 230, 230)
+                                                .addComponent(totalSubjectsLabel, GroupLayout.PREFERRED_SIZE, 230, GroupLayout.PREFERRED_SIZE)))
+                                .addContainerGap(17, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(labelTitle)
+                                .addGap(17, 17, 17)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGap(3, 3, 3)
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(nameField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(labelName))
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(labelNumber, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(numberField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(saveButton)
+                                                        .addComponent(deleteButton)))
+                                        .addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 167, GroupLayout.PREFERRED_SIZE))
+                                .addGap(18, 18, 18)
+                                .addComponent(totalSubjectsLabel, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(51, Short.MAX_VALUE))
+        );
+
+        pack();
+    }
+
+    private void initTable() {
+        String[] columnNames = {"Subject Name", "SKS"};
+        tableModel = new DefaultTableModel(columnNames, 0);
+        table.setModel(tableModel);
+    }
+
+    private void numberFieldActionPerformed(ActionEvent evt) {
+        // TODO add your handling code here:
+    }
+
+    private void saveData() {
+        String name = nameField.getText().trim();
+        String number = numberField.getText().trim();
+
+        if (!name.isEmpty() && !number.isEmpty()) {
+            try {
+                int subjects = Integer.parseInt(number);
+                if (subjects <= 20) {
+                    boolean nameExists = false;
+                    for (int i = 0; i < tableModel.getRowCount(); i++) {
+                        String existingName = ((String) tableModel.getValueAt(i, 0)).trim();
+                        if (existingName.equalsIgnoreCase(name)) {
+                            nameExists = true;
+                            break;
+                        }
+                    }
+
+                    if (!nameExists) {
+                        Object[] data = {name, subjects};
+                        tableModel.addRow(data);
+
+                        nameField.setText("");
+                        numberField.setText("");
+
+                        updateTotalSubjectsLabel();
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Subject name already exists in the table.");
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "Number of subjects cannot exceed 20.");
+                }
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Please enter a valid number for subjects.");
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Please enter both name and number of subjects.");
+        }
+    }
+
+    private void deleteData() {
+        int selectedRow = table.getSelectedRow();
+
+        if (selectedRow != -1) {
+            tableModel.removeRow(selectedRow);
+            updateTotalSubjectsLabel();
+        } else {
+            JOptionPane.showMessageDialog(this, "Please select a row to delete.");
+        }
+    }
+
+    private void updateTotalSubjectsLabel() {
+        int totalSubjects = 0;
+        for (int i = 0; i < tableModel.getRowCount(); i++) {
+            totalSubjects += (int) tableModel.getValueAt(i, 1);
+        }
+        totalSubjectsLabel.setText("Total SKS by Subject : " + totalSubjects);
+    }
+
+    public static void main(String args[]) {
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(StudentRegistration.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+
+        java.awt.EventQueue.invokeLater(() -> new StudentRegistration().setVisible(true));
+    }
+}
