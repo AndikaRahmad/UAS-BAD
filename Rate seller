@@ -1,0 +1,313 @@
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.sql.*;
+import java.util.Vector;
+
+public class RateSeller extends JFrame {
+
+    private JComboBox<String> ComboBoxFilterSellerName;
+    private JComboBox<String> ComboBoxSelectSellerName;
+    private JLabel LabelAverage;
+    private JLabel LabelFilteTableSeller;
+    private JLabel LabelRating;
+    private JLabel LabelTitleName;
+    private JLabel LabelnameCustomer;
+    private JLabel LabelnameSeller;
+    private JSlider SliderRating;
+    private JScrollPane jScrollPane1;
+    private JTextField nameField;
+    private JButton saveButton;
+    private JTable tableFromDB;
+    private DefaultComboBoxModel<String> sellerNameComboBoxModel;
+
+    private Connection connection;
+    private final String DB_URL = "jdbc:mysql://localhost:3306/tb_toy";
+    private final String DB_USER = "root";
+    private final String DB_PASSWORD = "";
+
+    public RateSeller() {
+        initDatabaseConnection();
+        initComponents();
+        refreshTableData();
+    }
+
+    private void initComponents() {
+        LabelnameCustomer = new JLabel();
+        nameField = new JTextField();
+        jScrollPane1 = new JScrollPane();
+        tableFromDB = new JTable();
+        saveButton = new JButton();
+        LabelTitleName = new JLabel();
+        SliderRating = new JSlider();
+        SliderRating.setMinimum(1);
+        SliderRating.setMaximum(5);
+        LabelnameSeller = new JLabel();
+        LabelRating = new JLabel();
+        LabelAverage = new JLabel();
+        ComboBoxFilterSellerName = new JComboBox<>();
+        LabelFilteTableSeller = new JLabel();
+        ComboBoxSelectSellerName = new JComboBox<>();
+
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+        LabelnameCustomer.setText("Name Customer");
+
+        tableFromDB.setModel(new DefaultTableModel(
+                new Object[][]{
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null}
+                },
+                new String[]{
+                        "seller_name", "customer_name", "rating", "created_at"
+                }
+        ));
+        jScrollPane1.setViewportView(tableFromDB);
+
+        saveButton.setText("Save");
+        saveButton.addActionListener(e -> saveDataToDatabase());
+
+        LabelTitleName.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        LabelTitleName.setText("Title is Rating Sellers");
+
+        LabelnameSeller.setText("Seller Name");
+
+        LabelRating.setText("Rating");
+
+        LabelAverage.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        LabelAverage.setText("Average Rating: 3.5");
+
+        updateSellerFilterComboBox();
+
+        ComboBoxFilterSellerName.addActionListener(e -> {
+            updateSellerSelectionComboBox();
+            refreshTableData();
+        });
+        LabelFilteTableSeller.setText("Select Seller Name :");
+        sellerNameComboBoxModel = new DefaultComboBoxModel<>();
+        ComboBoxSelectSellerName.setModel(sellerNameComboBoxModel);
+
+        GroupLayout layout = new GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(17, 17, 17)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                                .addComponent(LabelRating)
+                                                                .addComponent(LabelnameSeller)
+                                                                .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                                        .addComponent(SliderRating, GroupLayout.PREFERRED_SIZE, 242, GroupLayout.PREFERRED_SIZE)
+                                                                        .addGap(30, 30, 30)))
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                                                        .addComponent(saveButton, GroupLayout.PREFERRED_SIZE, 254, GroupLayout.PREFERRED_SIZE)
+                                                                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                                                                .addComponent(LabelnameCustomer)
+                                                                                .addComponent(nameField)
+                                                                                .addComponent(ComboBoxSelectSellerName, 0, 254, Short.MAX_VALUE)))
+                                                                .addGap(18, 18, 18)))
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(LabelFilteTableSeller)
+                                                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                                                .addComponent(ComboBoxFilterSellerName, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                                        .addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 496, GroupLayout.PREFERRED_SIZE)))
+                                        .addComponent(LabelAverage))
+                                .addContainerGap(18, Short.MAX_VALUE))
+                        .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(LabelTitleName)
+                                .addGap(303, 303, 303))
+        );
+        layout.setVerticalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(LabelTitleName)
+                                .addGap(16, 16, 16)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(ComboBoxFilterSellerName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(LabelFilteTableSeller)
+                                        .addComponent(LabelnameSeller))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(ComboBoxSelectSellerName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(LabelnameCustomer)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(nameField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(LabelRating)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(SliderRating, GroupLayout.PREFERRED_SIZE, 11, GroupLayout.PREFERRED_SIZE)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(saveButton))
+                                        .addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(LabelAverage)
+                                .addContainerGap(17, Short.MAX_VALUE))
+        );
+
+        pack();
+    }
+
+    private void initDatabaseConnection() {
+        try {
+            connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+        } catch (SQLException e) {
+            handleSQLException(e, "Failed to connect to the database.");
+            System.exit(1);
+        }
+    }
+
+    private void saveDataToDatabase() {
+        try {
+            String sellerName = ComboBoxSelectSellerName.getSelectedItem().toString();
+            String customerName = nameField.getText();
+            int rating = SliderRating.getValue();
+
+            String query = "INSERT INTO seller_rating (seller_name, customer_name, rating, created_at) VALUES (?, ?, ?, NOW())";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setString(1, sellerName);
+                preparedStatement.setString(2, customerName);
+                preparedStatement.setInt(3, rating);
+
+                preparedStatement.executeUpdate();
+                refreshTableData();
+            }
+        } catch (SQLException e) {
+            handleSQLException(e, "Failed to save data to the database.");
+        }
+    }
+
+    private void updateSellerFilterComboBox() {
+        try {
+            String query = "SELECT DISTINCT seller_name FROM seller_rating";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query);
+                 ResultSet resultSet = preparedStatement.executeQuery()) {
+
+                ComboBoxFilterSellerName.removeAllItems();
+                ComboBoxFilterSellerName.addItem("All Sellers");
+                while (resultSet.next()) {
+                    ComboBoxFilterSellerName.addItem(resultSet.getString("seller_name"));
+                }
+            }
+        } catch (SQLException e) {
+            handleSQLException(e, "Failed to update seller filter combo box.");
+        }
+    }
+
+    private void updateSellerSelectionComboBox() {
+        String selectedSellerName = ComboBoxFilterSellerName.getSelectedItem().toString();
+        ComboBoxSelectSellerName.setSelectedItem(selectedSellerName);
+    }
+
+    private void refreshTableData() {
+        try {
+            String selectedSellerName = ComboBoxFilterSellerName.getSelectedItem().toString();
+            String query = "SELECT seller_name, customer_name, rating, created_at FROM seller_rating";
+
+            if (!"All Sellers".equals(selectedSellerName)) {
+                query += " WHERE seller_name = ?";
+            }
+
+            query += " ORDER BY created_at DESC";
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                if (!"All Sellers".equals(selectedSellerName)) {
+                    preparedStatement.setString(1, selectedSellerName);
+                }
+
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    Vector<Vector<Object>> data = new Vector<>();
+                    while (resultSet.next()) {
+                        Vector<Object> row = new Vector<>();
+                        row.add(resultSet.getString("seller_name"));
+                        row.add(resultSet.getString("customer_name"));
+                        row.add(resultSet.getInt("rating"));
+                        row.add(resultSet.getTimestamp("created_at"));
+                        data.add(row);
+                    }
+
+                    Vector<String> columnNames = new Vector<>();
+                    columnNames.add("Seller Name");
+                    columnNames.add("Customer Name");
+                    columnNames.add("Rating");
+                    columnNames.add("Created At");
+
+                    DefaultTableModel tableModel = new DefaultTableModel(data, columnNames);
+                    tableFromDB.setModel(tableModel);
+
+                    sellerNameComboBoxModel.removeAllElements();
+
+                    query = "SELECT DISTINCT seller_name FROM seller_rating";
+                    try (PreparedStatement comboPreparedStatement = connection.prepareStatement(query);
+                         ResultSet comboResultSet = comboPreparedStatement.executeQuery()) {
+
+                        while (comboResultSet.next()) {
+                            sellerNameComboBoxModel.addElement(comboResultSet.getString("seller_name"));
+                        }
+
+                        ComboBoxSelectSellerName.setSelectedItem(selectedSellerName);
+                    }
+                }
+            }
+            updateAverageRating();
+        } catch (SQLException e) {
+            handleSQLException(e, "Failed to retrieve data from the database.");
+        }
+    }
+
+    private void updateAverageRating() {
+        try {
+            String selectedSellerName = ComboBoxFilterSellerName.getSelectedItem().toString();
+            String query = "SELECT AVG(rating) AS average_rating FROM seller_rating";
+
+            if (!"All Sellers".equals(selectedSellerName)) {
+                query += " WHERE seller_name = ?";
+            }
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                if (!"All Sellers".equals(selectedSellerName)) {
+                    preparedStatement.setString(1, selectedSellerName);
+                }
+
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        double averageRating = resultSet.getDouble("average_rating");
+                        LabelAverage.setText("Average Rating: " + String.format("%.2f", averageRating));
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            handleSQLException(e, "Failed to retrieve average rating from the database.");
+        }
+    }
+
+    private void handleSQLException(SQLException e, String errorMessage) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    public static void main(String args[]) {
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+            ex.printStackTrace();
+        }
+
+        java.awt.EventQueue.invokeLater(() -> new RateSeller().setVisible(true));
+    }
+}
